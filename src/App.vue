@@ -1,6 +1,6 @@
 <template>
   <div class="App">
-    <sidebar />
+    <Sidebar v-if="showSidebar" />
     <router-view />,
   </div>
 </template>
@@ -16,6 +16,11 @@ export default defineComponent({
     RouterView,
     Sidebar
   },
+  computed: {
+    showSidebar() {
+      return this.$route.name !== 'login' && this.$route.name !== 'register';
+    }
+  }
 });
 </script>
 

@@ -1,17 +1,61 @@
 <template>
-    <div class="sidebar-container">
-      <div class="sidebar" :class="{ 'sidebar-open': isSidebarOpen }">
-        <ul>
-          <li>Item 1</li>
-          <li>Item 2</li>
-          <li>Item 3</li>
-          <li>Item 4</li>
-        </ul>
-      </div>
+  <div class="sidebar-container">
+    <div class="sidebar" :class="{ 'sidebar-open': isSidebarOpen }">
+      <ul class="sidebar-menu">
+        <li>
+          <router-link to="/" @click="scrollToTop">
+          <button class="sidebar-button">
+            <span class="sidebar-text">Home</span>
+            <img src="templogo.svg" class="sidebar-icon-button" />
+          </button>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/profile">
+          <button class="sidebar-button">
+            <span class="sidebar-text">Your Profile</span>
+            <img src="tempprofile.svg" class="sidebar-icon-button" />
+          </button>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/upload">
+          <button class="sidebar-button">
+            <span class="sidebar-text">Upload image</span>
+            <img src="add.svg" class="sidebar-icon-button" />
+          </button>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/about">
+          <button class="sidebar-button">
+            <span class="sidebar-text">About</span>
+            <img src="about.svg" class="sidebar-icon-button" />
+          </button>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/settings">
+          <button class="sidebar-button">
+            <span class="sidebar-text">Settings</span>
+            <img src="settings.svg" class="sidebar-icon-button" />
+          </button>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/login">
+          <button class="sidebar-button">
+            <span class="sidebar-text">Log out</span>
+            <img src="logout.svg" class="sidebar-icon-button" />
+          </button>
+        </router-link>
+        </li>
+      </ul>
     </div>
-  </template>
+  </div>
+</template>
   
-  <script>
+<script>
   export default {
     name: 'App',
     data() {
@@ -22,12 +66,15 @@
     methods: {
       toggleSidebar() {
         this.isSidebarOpen = !this.isSidebarOpen;
+      },
+      scrollToTop() {
+        window.scrollTo(0, 0);
       }
     }
   }
-  </script>
+</script>
   
-  <style>
+<style>
   .sidebar-container {
     display: flex;
   }
@@ -38,20 +85,57 @@
     background-image: linear-gradient(79deg, white, #00ffea);
     position: fixed;
     top: 0;
-    left: -230px;
+    left: -210px;
+    border-right: 5px solid white;
     transition: left 0.3s ease-in-out;
   }
   
   .sidebar-open {
     left: 0;
   }
-  
-  .main-content {
-    padding: 20px;
-    flex: 1;
-  }
-  
+
   .sidebar:hover {
     left: 0;
   }
-  </style>
+  
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+
+  .sidebar-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 96%;
+    height: 6rem;
+    padding: 10px;
+    background-color: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition-duration: 0.3s;
+  }
+
+  .sidebar-icon-button {
+    margin-bottom: 0px;
+    margin-right: -40px;
+    width: 5rem;
+  }
+
+  .sidebar-text {
+    font-weight: bold;
+    font-size: 32px;
+    text-align: left;
+
+  }
+
+  .sidebar-button:hover {
+    background-color: #00ffa2;
+  }
+
+  .sidebar-button:active {
+    background-color: #00ff44;
+  }
+ </style>

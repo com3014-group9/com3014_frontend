@@ -22,11 +22,16 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
+  handleSubmit() {
+    if (this.email.trim() === "" || this.password.trim() === "") {
+      // display an error message or alert
+      alert("Please fill in all fields.");
+    } else {
       console.log(this.email, this.password);
       // Redirect to the home page after successful login
       this.$router.push("/");
-    },
+    }
   },
+},
 };
 </script>

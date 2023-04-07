@@ -25,11 +25,15 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
+  handleSubmit() {
+    if (this.name && this.email && this.password) {
       console.log(this.name, this.email, this.password);
       // Redirect to the home page after successful registration
       this.$router.push("/");
-    },
+    } else {
+      alert("Please fill in all the fields.");
+    }
   },
+},
 };
 </script>

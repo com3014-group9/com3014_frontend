@@ -8,9 +8,9 @@
         <button class='btn' type="submit">Submit</button>
       </form>
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   export default {
     data() {
       return {
@@ -32,7 +32,8 @@
       }
     }
   }
-  </script>
+</script>
+
 <style>
 
 </style>

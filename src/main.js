@@ -8,6 +8,10 @@ import Upload from './components/Upload.vue';
 import About from './components/About.vue'
 import '@fortawesome/fontawesome-free/css/all.css'
 import { createRouter, createWebHistory } from "vue-router";
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -41,4 +45,5 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-app.use(router).mount("#app").component('sidebar', Sidebar);
+app.use(router).mount("#app");
+app.component('sidebar', Sidebar);

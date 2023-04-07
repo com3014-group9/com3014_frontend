@@ -15,25 +15,39 @@
 </template>
 
 <script>
-export default {
-  name: "register",
-  data() {
-    return {
-      name: "",
-      email: "",
-      password: "",
-    };
-  },
-  methods: {
-  handleSubmit() {
-    if (this.name && this.email && this.password) {
-      console.log(this.name, this.email, this.password);
-      // Redirect to the home page after successful registration
-      this.$router.push("/");
-    } else {
-      alert("Please fill in all the fields.");
-    }
-  },
-},
-};
+  import axios from "axios";
+  export default {
+    name: "register",
+    data() {
+      return {
+        name: "",
+        email: "",
+        password: "",
+      };
+    },
+    methods: {
+      async handleSubmit() {
+        if (this.email.trim() === "" || this.password.trim() === "") {
+          alert("Please fill in all fields.");
+        } else {
+          try {
+            const response = await axios.post("http://localhost:5000/auth/signup", {
+              email: this.email,
+              password: this.password,
+            });
+            const { access_token, refresh_token } = response.data;
+            // Store the tokens in local storage for later use
+            localStorage.setItem("access_token", access_token);
+            localStorage.setItem("refresh_token", refresh_token);
+            // Redirect to the home page after successful registration
+            this.$router.push("/");
+          } catch (error) {
+            // Handle errors, e.g. display an error message or alert
+            console.error(error);
+            alert("Registration failed. Please try again.");
+          }
+        }
+      }
+    },
+  };
 </script>

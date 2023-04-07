@@ -43,12 +43,10 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/login">
-          <button class="sidebar-button">
+          <button class="sidebar-button" @click="handleLogout">
             <span class="sidebar-text">Log out</span>
             <img src="logout.svg" class="sidebar-icon-button" />
           </button>
-        </router-link>
         </li>
       </ul>
     </div>
@@ -56,6 +54,7 @@
 </template>
   
 <script>
+import axios from "axios";
   export default {
     name: 'App',
     data() {
@@ -64,6 +63,23 @@
       }
     },
     methods: {
+      async handleLogout() {
+        try {
+          // Make a request to the server to log the user out
+          await axios.post("http://localhost:5000/auth/logout", {}, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+          });
+          // Remove the tokens from local storage
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          // Redirect to the login page after successful logout
+          this.$router.push("/login");
+        } catch (error) {
+          // Handle errors, e.g. display an error message or alert
+          console.error(error);
+          alert("Logout failed. Please try again.");
+        }
+      },
       toggleSidebar() {
         this.isSidebarOpen = !this.isSidebarOpen;
       },

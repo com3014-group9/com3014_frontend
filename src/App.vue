@@ -85,6 +85,7 @@ button {
 }
 
 .btn {
+  margin: 0.5rem;
   border-radius: 10px;
   background-color: var(--background-color);
   transition-duration: 0.4s;

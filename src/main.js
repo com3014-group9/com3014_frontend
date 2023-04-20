@@ -5,7 +5,10 @@ import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 import Sidebar from './components/Sidebar.vue'
 import Upload from './components/Upload.vue';
-import About from './components/About.vue'
+import About from './components/About.vue';
+import Profile from './components/Profile.vue';
+import Search from './components/Search.vue';
+
 import '@fortawesome/fontawesome-free/css/all.css'
 import { createRouter, createWebHistory } from "vue-router";
 import axios from 'axios';
@@ -37,10 +40,20 @@ const router = createRouter({
         component: About,
     },
     {
-      path: "/upload",
-      name: "upload",
-      component: Upload,
-  }
+        path: "/upload",
+        name: "upload",
+        component: Upload,
+    },
+    {
+        path: "/profile",
+        name: "profile",
+        component: Profile,
+    },
+    {
+        path: '/search',
+        name: "search",
+        component: Search,
+    } 
   ],
 });
 

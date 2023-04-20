@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <sidebar />
     <h1>Home</h1>
 
     <div v-for="(image, index) in images" :key="index" class="image-container">

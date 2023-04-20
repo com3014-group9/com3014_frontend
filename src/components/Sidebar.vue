@@ -6,7 +6,15 @@
           <router-link to="/" @click="scrollToTop">
           <button class="sidebar-button">
             <span class="sidebar-text">Home</span>
-            <img src="templogo.svg" class="sidebar-icon-button" />
+            <img src="/templogo.svg" class="sidebar-icon-button" />
+          </button>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/search">
+          <button class="sidebar-button">
+            <span class="sidebar-text">Search</span>
+            <img src="/search.svg" class="sidebar-icon-button" />
           </button>
           </router-link>
         </li>
@@ -14,7 +22,7 @@
           <router-link to="/profile">
           <button class="sidebar-button">
             <span class="sidebar-text">Your Profile</span>
-            <img src="tempprofile.svg" class="sidebar-icon-button" />
+            <img src="/tempprofile.svg" class="sidebar-icon-button" />
           </button>
           </router-link>
         </li>
@@ -22,7 +30,7 @@
           <router-link to="/upload">
           <button class="sidebar-button">
             <span class="sidebar-text">Upload image</span>
-            <img src="add.svg" class="sidebar-icon-button" />
+            <img src="/add.svg" class="sidebar-icon-button" />
           </button>
           </router-link>
         </li>
@@ -30,7 +38,7 @@
           <router-link to="/about">
           <button class="sidebar-button">
             <span class="sidebar-text">About</span>
-            <img src="about.svg" class="sidebar-icon-button" />
+            <img src="/about.svg" class="sidebar-icon-button" />
           </button>
           </router-link>
         </li>
@@ -38,14 +46,14 @@
           <router-link to="/settings">
           <button class="sidebar-button">
             <span class="sidebar-text">Settings</span>
-            <img src="settings.svg" class="sidebar-icon-button" />
+            <img src="/settings.svg" class="sidebar-icon-button" />
           </button>
           </router-link>
         </li>
         <li>
           <button class="sidebar-button" @click="handleLogout">
             <span class="sidebar-text">Log out</span>
-            <img src="logout.svg" class="sidebar-icon-button" />
+            <img src="/logout.svg" class="sidebar-icon-button" />
           </button>
         </li>
       </ul>
@@ -125,7 +133,7 @@ import axios from "axios";
     justify-content: space-between;
     align-items: center;
     width: 96%;
-    height: 6rem;
+    height: 5.5rem;
     padding: 10px;
     background-color: transparent;
     border: none;

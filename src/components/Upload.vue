@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class = "upload-container">
       <form @submit.prevent="submitForm">
         <label for="image">Upload Image:</label>
         <input type="file" id="image" ref="image" accept="image/*">
@@ -35,5 +35,16 @@
 </script>
 
 <style>
-
+    .upload-container {
+      flex-wrap: wrap;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 5px solid white;
+      border-radius: 10px;
+      margin: 2rem 0;
+      padding: 2rem;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
 </style>

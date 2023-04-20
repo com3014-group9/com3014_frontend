@@ -6,6 +6,7 @@ export default defineConfig({
     vue(),
   ],
   server: {
-    port: 8080 // Specify the port you want to use
+    port: 4173, // Specify the port you want to use
+    host: true
   }
 })

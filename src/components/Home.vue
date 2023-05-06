@@ -3,72 +3,119 @@
     <h1>Home</h1>
 
     <div v-for="(image, index) in images" :key="index" class="image-container">
-      <div class="image-wrapper">
-        <router-link :to="`/profile/${image.profileName}`" class="profile">
-          <img :src="image.profileIcon" class="profile-icon" />
-          <h2 class="profile-name">{{ image.profileName }}</h2>
-        </router-link>
-        <img :src="image.src" />
-        <div class="like">
-          <button class="like-button" @click="toggleLike(index)">
-            <i :class="[image.liked ? 'fas' : 'far', 'fa-heart']"></i>&nbsp;{{ image.likes }}
-          </button>
-          <button class="like-button" @click="toggleComments">
-            <i class="far fa-comment"></i>
-          </button>
-        </div>
-        <div class="image-caption">{{ image.caption }}</div>
-        <div class="comments" v-if="showComments">
-            <input v-model="commentInput" placeholder="Write a comment..." />
-            <button class = "btn" @click="submitComment(index)">Submit</button>
-            <div v-for="(comment, cIndex) in image.comments" :key="cIndex" class="image-comment">
-              {{ comment.username }}: {{ comment.text }}
+            <div class="image-wrapper">
+                <router-link :to="`/profile/${image.user_id}`" class="profile-link">
+                    <img :src="image.profileIcon" class="profile-icon" />
+                    <h2 class="profile-name">{{ image.profileName }}</h2>
+                </router-link>
+                <img :src="image.src" />
+                <div class="like">
+                    <button class="like-button" @click="toggleLike(index)">
+                    <i :class="[image.liked ? 'fas' : 'far', 'fa-heart']"></i>&nbsp;{{ image.likes }}
+                    </button>
+                    <!-- <button class="like-button" @click="toggleComments">
+                    <i class="far fa-comment"></i>
+                    </button> -->
+                </div>
+                <!-- <div class="image-caption">{{ image.caption }}</div>
+                <div class="comments" v-if="showComments">
+                    <input v-model="commentInput" placeholder="Write a comment..." />
+                    <button class = "btn" @click="submitComment(index)">Submit</button>
+                    <div v-for="(comment, cIndex) in image.comments" :key="cIndex" class="image-comment">
+                        {{ comment.username }}: {{ comment.text }}
+                    </div>
+                </div> -->
             </div>
-          </div>
-      </div>
+        </div>
+        <div v-if="noImages" class="no-images-message">
+          <h1>No images found.</h1>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
+  import axios from 'axios';
   export default {
     name: "home",
+    
+    async mounted() {
+      const follows = await this.fetchFollows();
+      for (const userId of follows) {
+        await this.fetchImages(userId);
+      }
+    },
     data() {
       return {
-        images: [
-          {
-            profileIcon: "tempprofile.svg",
-            profileName: "catman",
-            src: "tilly.jpg",
-            caption: "Caption for image 1",
-            likes: 0,
-            liked: false,
-            comments: [],
-          },
-          {
-            profileIcon: "tempprofile.svg",
-            profileName: "catman",
-            src: "tilly2.jpg",
-            caption: "Caption for image 2",
-            likes: 0,
-            liked: false,
-            comments: [],
-          },
-          {
-            profileIcon: "tempprofile.svg",
-            profileName: "catman",
-            src: "tilly6.jpg",
-            caption: "Caption for image 3",
-            likes: 0,
-            liked: false,
-            comments: [],
-          },
-        ],
-        commentInput: "",
-        showComments: false,
+        noImages: false,
+        images: [],
+        // commentInput: "",
+        // showComments: false,
       };
     },
     methods: {
+      async fetchFollows() {
+          try {
+            const response = await axios.get('http://localhost:5051/profile/get_follows', {
+              params: {
+                user_id: localStorage.getItem("user_id")
+              }
+            });
+            return response.data.follows;
+          } catch (error) {
+            console.error(error);
+            alert("Failed to fetch follows.");
+            return [];
+          }
+        },
+      async fetchImages(userId) {
+          try {
+              const userResponse = await axios.get('http://localhost:5051/profile/get_user_info', {
+                params: {
+                  user_id: userId
+                }
+              });
+              const user = userResponse.data;
+
+              const response = await axios.get(`http://localhost:5050/images/user/${userId}`, {
+                  headers: {
+                      "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                  },
+              });
+              const images = response.data.images;
+              //console.log(images);
+
+              for (const image of images) {
+                  const secureImageResponse = await axios.get(image, {
+                      headers: {
+                          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                      },
+                      responseType: 'blob'
+                  });
+
+                  const imageUrl = URL.createObjectURL(secureImageResponse.data);
+
+                  this.images.push({
+                      user_id: user.user_id,
+                      profileIcon: user.pfp || '/tempprofile.svg',
+                      profileName: user.user_name,
+                      src: imageUrl,
+                      caption: "Caption for image",
+                      created: new Date(image.timestamp),
+                      likes: 0,
+                      liked: false,
+                      comments: [],
+                  });
+              }
+              this.images.sort((a, b) => b.created - a.created);
+          } catch (error) {
+              if (error.response && error.response.status === 404) {
+                  this.noImages = true;
+              } else {
+                  console.error('Error fetching images:', error);
+              }
+          };
+      },
+
       toggleLike(index) {
         const image = this.images[index];
         if (image.liked) {
@@ -78,20 +125,20 @@
         }
         image.liked = !image.liked;
       },
-      toggleComments() {
-        this.showComments = !this.showComments;
-      },
-      submitComment(index) {
-        const image = this.images[index];
-        if (this.commentInput.trim() !== '') {
-          image.comments.push({
-            text: this.commentInput,
-            username: image.profileName,
-          });
-          this.commentInput = "";
-          this.showCommentForm = false;
-        }
-      }
+      // toggleComments() {
+      //   this.showComments = !this.showComments;
+      // },
+      // submitComment(index) {
+      //   const image = this.images[index];
+      //   if (this.commentInput.trim() !== '') {
+      //     image.comments.push({
+      //       text: this.commentInput,
+      //       username: image.profileName,
+      //     });
+      //     this.commentInput = "";
+      //     this.showCommentForm = false;
+      //   }
+      // }
     },
   };
 </script>

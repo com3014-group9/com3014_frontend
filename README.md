@@ -1,7 +1,36 @@
-# Vue 3 + Vite
+# com3014_frontend
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+The frontend application for the cat image sharing app, built on vite + vue.js
 
-## Recommended IDE Setup
+## Overview
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+This is the frontend application that the user interacts with, connecting the other services together so that they can be used and interacted with, The app includes the following features:
+
+- Registering a new profile
+- Logging in and out of your profile (utilizing Authentication and Profile services)
+- Sidebar Navigation
+- Upload your own images (through the Image service)
+- Viewing  your uploaded images in your profile page
+- Searching for other profiles by their user id
+- Following other users
+- Viewing  followed users# pictures on your home page
+
+*Note: Additional features like changing your profile picture and liking images are planned but not fully implemented.*
+
+## Usage
+
+### Docker
+
+Docker must be installed on the system. Run `docker-compose up --build` from the root of the repository. Once running, the service is accessible on the localhost:4173.
+
+### Local Development
+
+Alternativaly the app can be started by running the following commands: 
+`npm install` 
+`npm run build` 
+`npm run serve`
+
+## Tests
+
+Tests are run using Vitest. To run the tests, use the following command:
+`npm run test`

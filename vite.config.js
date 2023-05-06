@@ -8,5 +8,8 @@ export default defineConfig({
   server: {
     port: 4173, // Specify the port you want to use
     host: true
+  },
+  test: {
+    globals: true,
   }
 })

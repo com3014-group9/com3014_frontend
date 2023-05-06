@@ -9,6 +9,7 @@
 import { defineComponent } from 'vue';
 import { RouterView } from 'vue-router';
 import Sidebar from './components/Sidebar.vue'
+import axios from 'axios'
 
 export default defineComponent({
   name: 'App',
@@ -20,7 +21,7 @@ export default defineComponent({
     showSidebar() {
       return this.$route.name !== 'login' && this.$route.name !== 'register';
     }
-  }
+  },
 });
 </script>
 

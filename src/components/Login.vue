@@ -32,11 +32,13 @@ export default {
             email: this.email,
             password: this.password,
           });
-          const { access_token, refresh_token } = response.data;
-          // Store the tokens in local storage for later use
+          const { access_token, refresh_token, user_id } = response.data;
+            // Store the tokens in local storage for later use
           localStorage.setItem("access_token", access_token);
           localStorage.setItem("refresh_token", refresh_token);
+          localStorage.setItem("user_id", user_id);
           // Redirect to the home page after successful login
+          console.log(localStorage.getItem("user_id"));
           this.$router.push("/");
         } catch (error) {
           // Handle errors, e.g. display an error message or alert

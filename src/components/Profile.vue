@@ -2,122 +2,305 @@
     <div class="account">
         <div class="profile-container"> 
             <img :src="user.profilePicture" class="profile-picture" />
-            <h1>{{user.name}}</h1>
+            <h1>{{user.username}}</h1>
             <button class="follow-button" @click="toggleFollow">{{ user.isFollowing ? 'Unfollow' : 'Follow' }}</button>
             <div class="followers">
-                <h2>{{ user.followers }} Followers</h2>
-                <h2>{{ user.followers }} Following</h2>
+                <h2>{{ this.user.followers }} Followers</h2>
+                <h2>{{ this.user.following }} Following</h2>
             </div>
         </div> 
         <div v-for="(image, index) in images" :key="index" class="image-container">
             <div class="image-wrapper">
-                <router-link :to="`/profile/${image.profileName}`" class="profile-link">
+                <router-link :to="`/profile/${user.user_id}`" class="profile-link">
                     <img :src="image.profileIcon" class="profile-icon" />
                     <h2 class="profile-name">{{ image.profileName }}</h2>
                 </router-link>
                 <img :src="image.src" />
-                <div class="like">
+                <!-- <div class="like">
                     <button class="like-button" @click="toggleLike(index)">
                     <i :class="[image.liked ? 'fas' : 'far', 'fa-heart']"></i>&nbsp;{{ image.likes }}
                     </button>
                     <button class="like-button" @click="toggleComments">
                     <i class="far fa-comment"></i>
                     </button>
-                </div>
-                <div class="image-caption">{{ image.caption }}</div>
+                </div> -->
+                <!-- <div class="image-caption">{{ image.caption }}</div>
                 <div class="comments" v-if="showComments">
                     <input v-model="commentInput" placeholder="Write a comment..." />
                     <button class = "btn" @click="submitComment(index)">Submit</button>
                     <div v-for="(comment, cIndex) in image.comments" :key="cIndex" class="image-comment">
                         {{ comment.username }}: {{ comment.text }}
                     </div>
-                </div>
+                </div> -->
             </div>
+        </div>
+        <div v-if="noImages" class="no-images-message">
+          <h1>No images found.</h1>
         </div>
     </div>
   </template>
   
   <script>
+    import axios from 'axios';
     export default {
       name: "account",
+      props: ['userId'],
+      computed: {
+        isOwnProfile() {
+          return this.userId === localStorage.getItem("user_id");
+        }
+      },
+      watch: {
+        async userId(newUserId) {
+          // Reset component state
+          this.user = {
+            user_id: '',
+            profilePicture: '',
+            username: '',
+            isFollowing: false,
+            followers: [],
+            following: [],
+          };
+          this.images = [];
+
+          // Fetch the new user's data
+          const userInfo = await this.getUserInfo(newUserId);
+
+          if (userInfo) {
+            this.user.user_id = userInfo.user_id;
+            this.user.username = userInfo.user_name;
+            this.user.profilePicture = userInfo.pfp || '/tempprofile.svg';
+            this.user.followers = userInfo.followers.length;
+            this.user.following = userInfo.follows.length;
+          }
+          // Fetch follows of the logged-in user
+          const loggedInUserFollows = await this.fetchFollows();
+          // Check if the user being viewed is in the follows list
+          this.user.isFollowing = loggedInUserFollows.includes(this.user.user_id);
+
+          this.fetchImages(newUserId);
+        },
+      },
+      
+      async mounted() {
+        const userInfo = await this.getUserInfo(this.userId);
+
+        if (userInfo) {
+          this.user.user_id = userInfo.user_id;
+          this.user.username = userInfo.user_name;
+          this.user.profilePicture = userInfo.pfp || '/tempprofile.svg';
+          this.user.followers = userInfo.followers.length;
+          this.user.following = userInfo.follows.length;
+        }
+          // Fetch follows of the logged-in user
+        const loggedInUserFollows = await this.fetchFollows();
+        // Check if the user being viewed is in the follows list
+        this.user.isFollowing = loggedInUserFollows.includes(this.user.user_id);
+
+        this.fetchImages(this.userId);
+      },
+
       data() {
         return {
+            noImages: false,
             user: {
-                profilePicture: "tempprofile.svg",
-                name: "Catman",
+                user_id: '',
+                profilePicture: '',
+                username: '',
                 isFollowing: false,
-                followers: 0,
-                following: 0
+                followers: [],
+                following: []
             },
 
-            images: [
-                {
-                profileIcon: "tempprofile.svg",
-                profileName: "catman",
-                src: "tilly.jpg",
-                caption: "Caption for image 1",
-                likes: 0,
-                liked: false,
-                comments: [],
-                },
-                {
-                profileIcon: "tempprofile.svg",
-                profileName: "catman",
-                src: "tilly2.jpg",
-                caption: "Caption for image 2",
-                likes: 0,
-                liked: false,
-                comments: [],
-                },
-                {
-                profileIcon: "tempprofile.svg",
-                profileName: "catman",
-                src: "tilly6.jpg",
-                caption: "Caption for image 3",
-                likes: 0,
-                liked: false,
-                comments: [],
-                },
-            ],
-          commentInput: "",
-          showComments: false,
+            images: [],
+          //commentInput: "",
+          //showComments: false,
         };
       },
       methods: {
-        toggleFollow() {
-            const user = this.user;
-            user.isFollowing = !user.isFollowing;
-            if (user.isFollowing) {
-                user.followers++;
-                user.following++;
-            } else {
-                user.followers--;
-                user.following++;
-            }
-        },
-        toggleLike(index) {
-          const image = this.images[index];
-          if (image.liked) {
-            image.likes--;
-          } else {
-            image.likes++;
-          }
-          image.liked = !image.liked;
-        },
-        toggleComments() {
-          this.showComments = !this.showComments;
-        },
-        submitComment(index) {
-          const image = this.images[index];
-          if (this.commentInput.trim() !== '') {
-            image.comments.push({
-              text: this.commentInput,
-              username: image.profileName,
+        async getUserInfo(userId) {
+          try {
+            const response = await axios.get('http://localhost:5051/profile/get_user_info', {
+              params: {
+                  user_id: userId
+              }
             });
-            this.commentInput = "";
-            this.showCommentForm = false;
+            //console.log(response.data);
+            const { user_id, user_name, pfp, followers, follows } = response.data;
+            return { user_id, user_name, pfp, followers, follows };
+          } catch (error) {
+            console.error(error);
+            alert("Failed to fetch user information. Please try again.");
+            return null;
           }
-        }
+        },
+
+        async fetchImages(userId) {
+          try {
+              const response = await axios.get(`http://localhost:5050/images/user/${userId}`, {
+                  headers: {
+                      "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                  },
+              });
+              const images = response.data.images;
+              //console.log(images);
+
+              for (const image of images) {
+                  const secureImageResponse = await axios.get(image, {
+                      headers: {
+                          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                      },
+                      responseType: 'blob'
+                  });
+
+                  const imageUrl = URL.createObjectURL(secureImageResponse.data);
+
+                  this.images.push({
+                      id: image.id,
+                      profileIcon: this.user.profilePicture || '/tempprofile.svg',
+                      profileName: this.user.username,
+                      src: imageUrl,
+                      caption: "Caption for image",
+                      // likes: image.likes,
+                      // liked: image.liked_by ? image.liked_by.includes(localStorage.getItem("user_id")) : false,
+                      // comments: [],
+                  });
+              }
+          } catch (error) {
+              if (error.response && error.response.status === 404) {
+                  this.noImages = true;
+              } else {
+                  console.error('Error fetching images:', error);
+              }
+          };
+        },
+
+        async fetchFollows() {
+          try {
+            const response = await axios.get('http://localhost:5051/profile/get_follows', {
+              params: {
+                user_id: localStorage.getItem("user_id")
+              }
+            });
+            return response.data.follows;
+          } catch (error) {
+            console.error(error);
+            alert("Failed to fetch follows.");
+            return [];
+          }
+        },
+
+        async toggleFollow() {
+          try {
+            if (!this.user.isFollowing) {
+              // Follow the user
+              const response = await axios.post('http://localhost:5051/profile/follow_user', {
+                  user_to_follow: this.user.user_id,
+                }, {
+                headers: {
+                  "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                }});
+
+              if (response.status === 200) {
+                this.user.isFollowing = true;
+                this.user.followers++;
+              } else {
+                console.error(response.data.error);
+              }
+            } else {
+              // Unfollow the user
+              const response = await axios.post('http://localhost:5051/profile/unfollow_user',  {
+                  user_to_unfollow: this.user.user_id,
+                }, {
+                headers: {
+                  "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                }});
+
+              if (response.status === 200) {
+                this.user.isFollowing = false;
+                this.user.followers--;
+              } else {
+                console.error(response.data.error);
+              }
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        },
+        // async toggleLike(index) {
+        //   const image = this.images[index];
+        //   if (image.liked) {
+        //     const success = await this.unlikeImage(image.id);
+        //     if (success) {
+        //       image.likes--;
+        //       image.liked = false;
+        //     }
+        //   } else {
+        //     const success = await this.likeImage(image.id);
+        //     if (success) {
+        //       image.likes++;
+        //       image.liked = true;
+        //     }
+        //   }
+        // },
+
+        // async likeImage(imageId) {
+        //   try {
+        //     const response = await axios.post('http://localhost:5050/images/like', {
+        //       image_id: imageId,
+        //     }, {
+        //       headers: {
+        //         "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+        //       },
+        //     });
+
+        //     if (response.status === 200) {
+        //       return true;
+        //     } else {
+        //       console.error(response.data.error);
+        //       return false;
+        //     }
+        //   } catch (error) {
+        //     console.error(error);
+        //     return false;
+        //   }
+        // },
+
+        // async unlikeImage(imageId) {
+        //   try {
+        //     const response = await axios.post('http://localhost:5050/images/unlike', {
+        //       image_id: imageId,
+        //     }, {
+        //       headers: {
+        //         "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+        //       },
+        //     });
+
+        //     if (response.status === 200) {
+        //       return true;
+        //     } else {
+        //       console.error(response.data.error);
+        //       return false;
+        //     }
+        //   } catch (error) {
+        //     console.error(error);
+        //     return false;
+        //   }
+        // },
+        // toggleComments() {
+        //   this.showComments = !this.showComments;
+        // },
+        // submitComment(index) {
+        //   const image = this.images[index];
+        //   if (this.commentInput.trim() !== '') {
+        //     image.comments.push({
+        //       text: this.commentInput,
+        //       username: image.profileName,
+        //     });
+        //     this.commentInput = "";
+        //     this.showCommentForm = false;
+        //   }
+        // }
       },
     };
   </script>

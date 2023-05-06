@@ -35,16 +35,30 @@
               email: this.email,
               password: this.password,
             });
-            const { access_token, refresh_token } = response.data;
+            const { access_token, refresh_token, user_id } = response.data;
             // Store the tokens in local storage for later use
             localStorage.setItem("access_token", access_token);
             localStorage.setItem("refresh_token", refresh_token);
-            // Redirect to the home page after successful registration
-            this.$router.push("/");
+            localStorage.setItem("user_id", user_id);
+            console.log(response.data);
+            console.log(localStorage.getItem("user_id"));
+            // Create a new user profile
+            await axios.post(`http://localhost:5051/profile/create_user`, {
+              username: this.name,
+            }, {
+              headers: {
+                "Authorization": `Bearer ${access_token}`
+              }
+            });
+            // Redirect to the users profile page
+            this.$router.push(`/profile/${localStorage.getItem("user_id")}`);
           } catch (error) {
-            // Handle errors, e.g. display an error message or alert
             console.error(error);
-            alert("Registration failed. Please try again.");
+            if (error.response && error.response.status === 409) {
+              alert("Email address is already in use. Please use a different email or log in.");
+            } else {
+              alert("Registration failed. Please try again.");
+            }
           }
         }
       }

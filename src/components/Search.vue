@@ -1,7 +1,7 @@
 <template>
     <div class="search-container">
       <form @submit.prevent="search">
-        <label for="username">Search for username: </label>
+        <label for="username">Search for user by user_id: </label>
         <input id="username" type="text" v-model="searchTerm">
         <button class="btn" type="submit">Search</button>
       </form>
@@ -20,7 +20,10 @@
       search() {
         // Call your search function here, passing in the searchTerm
         this.$emit('search', this.searchTerm)
-      }
+        
+        // Redirect to the profile page of the user with the searchTerm as user_id
+        this.$router.push(`/profile/${this.searchTerm}`);
+          }
     }
   };
   </script>

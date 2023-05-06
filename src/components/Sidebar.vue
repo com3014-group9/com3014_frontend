@@ -19,7 +19,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/profile">
+          <router-link :to="`/profile/${loggedInUserId}`">
           <button class="sidebar-button">
             <span class="sidebar-text">Your Profile</span>
             <img src="/tempprofile.svg" class="sidebar-icon-button" />
@@ -70,16 +70,22 @@ import axios from "axios";
         isSidebarOpen: false
       }
     },
+    computed: {
+      loggedInUserId() {
+        return localStorage.getItem("user_id");
+      },
+    },
     methods: {
       async handleLogout() {
         try {
           // Make a request to the server to log the user out
-          await axios.post("http://localhost:5000/auth/logout", {}, {
+          await axios.post("http://localhost:5000/auth/logout", {
             headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
           });
           // Remove the tokens from local storage
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
+          localStorage.removeItem("user_id");
           // Redirect to the login page after successful logout
           this.$router.push("/login");
         } catch (error) {

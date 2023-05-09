@@ -9,13 +9,16 @@
                     <h2 class="profile-name">{{ image.profileName }}</h2>
                 </router-link>
                 <img :src="image.src" />
-                <div class="like">
+                <!-- <div class="like">
                     <button class="like-button" @click="toggleLike(index)">
                     <i :class="[image.liked ? 'fas' : 'far', 'fa-heart']"></i>&nbsp;{{ image.likes }}
                     </button>
-                    <!-- <button class="like-button" @click="toggleComments">
+                     <button class="like-button" @click="toggleComments">
                     <i class="far fa-comment"></i>
-                    </button> -->
+                    </button>
+                 </div> -->
+                <div class="image-tags">
+                  <span v-for="(tag, tagIndex) in image.tags" :key="tagIndex" class="tag">{{ tag }}</span>
                 </div>
                 <!-- <div class="image-caption">{{ image.caption }}</div>
                 <div class="comments" v-if="showComments">
@@ -85,7 +88,7 @@
               //console.log(images);
 
               for (const image of images) {
-                  const secureImageResponse = await axios.get(image, {
+                  const secureImageResponse = await axios.get(image.url, {
                       headers: {
                           "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
                       },
@@ -99,11 +102,12 @@
                       profileIcon: user.pfp || '/tempprofile.svg',
                       profileName: user.user_name,
                       src: imageUrl,
-                      caption: "Caption for image",
+                      tags: image.tags,
+                      //caption: "Caption for image",
                       created: new Date(image.timestamp),
-                      likes: 0,
-                      liked: false,
-                      comments: [],
+                      //likes: 0,
+                      //liked: false,
+                      //comments: [],
                   });
               }
               this.images.sort((a, b) => b.created - a.created);

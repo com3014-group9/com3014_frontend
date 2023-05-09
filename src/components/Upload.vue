@@ -13,7 +13,7 @@
 <script>
   import axios from 'axios'
   export default {
-     data() {
+    data() {
        return {
          tags: ["cat"],
        }
@@ -22,7 +22,6 @@
       async submitForm() {
         const formData = new FormData();
         formData.append('file', this.$refs.image.files[0]);
-        //formData.append('caption', this.caption);
         formData.append('tags', this.tags.join(' '));
         formData.append('owner', localStorage.getItem("user_id"));
 
@@ -51,6 +50,7 @@
         // After the form is submitted, you can reset the form fields
         this.image = null;
         this.caption = '';
+        this.$router.push(`/profile/${localStorage.getItem("user_id")}`);
       }
     }
   }

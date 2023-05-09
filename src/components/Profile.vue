@@ -16,6 +16,9 @@
                     <h2 class="profile-name">{{ image.profileName }}</h2>
                 </router-link>
                 <img :src="image.src" />
+                <div class="image-tags">
+                  <span v-for="(tag, tagIndex) in image.tags" :key="tagIndex" class="tag">{{ tag }}</span>
+                </div>
                 <!-- <div class="like">
                     <button class="like-button" @click="toggleLike(index)">
                     <i :class="[image.liked ? 'fas' : 'far', 'fa-heart']"></i>&nbsp;{{ image.likes }}
@@ -40,7 +43,7 @@
     </div>
   </template>
   
-  <script>
+<script>
     import axios from 'axios';
     export default {
       name: "account",
@@ -111,7 +114,6 @@
                 followers: [],
                 following: []
             },
-
             images: [],
           //commentInput: "",
           //showComments: false,
@@ -146,7 +148,7 @@
               //console.log(images);
 
               for (const image of images) {
-                  const secureImageResponse = await axios.get(image, {
+                  const secureImageResponse = await axios.get(image.url, {
                       headers: {
                           "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
                       },
@@ -160,7 +162,8 @@
                       profileIcon: this.user.profilePicture || '/tempprofile.svg',
                       profileName: this.user.username,
                       src: imageUrl,
-                      caption: "Caption for image",
+                      tags: image.tags
+                      //caption: "Caption for image",
                       // likes: image.likes,
                       // liked: image.liked_by ? image.liked_by.includes(localStorage.getItem("user_id")) : false,
                       // comments: [],
@@ -387,7 +390,7 @@
         width: 8rem;
         height: 8rem;
         margin: 0rem;
-        margin-left: -2rem;
+        margin-left: 0rem;
         margin-right: -1rem;
         padding: 1rem;
     }
@@ -436,5 +439,19 @@
       text-align: left;
       margin-bottom: -3rem;
     }
-  
+
+    .image-tags {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .tag {
+      background-color: rgba(0, 0, 0, 0.6);;
+      border-radius: 3px;
+      color: white;
+      font-size: 14px;
+      margin: 2px 5px 2px 0;
+      padding: 2px 5px;
+    }
   </style>

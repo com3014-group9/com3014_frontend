@@ -13,10 +13,16 @@
 <script>
   import axios from 'axios'
   export default {
+    data() {
+       return {
+         tags: ["cat"],
+       }
+     },
     methods: {
       async submitForm() {
         const formData = new FormData();
         formData.append('file', this.$refs.image.files[0]);
+        formData.append('tags', this.tags.join(' '));
         formData.append('owner', localStorage.getItem("user_id"));
 
         console.log("Form data:");
